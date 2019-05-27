@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block javascript %}
+
+
+
+<script>
+
+
+$(function(){
+
+	var form = $("#user_type").closest("form");
+		
+	function validate(X){
+
+		if(X != ''){
+			$.ajax({
+				url: form.attr('validate'),
+				data: {
+				  'letter_web': X,
+				},
+				dataType: 'json',
+				
+				success: function(data){
+					
+					var out = data.guess.join(" ")
+					var pic = data.pics
+					var gover = data.game_over
+					
+					var lost = `<br/><br/>
+								<font size=16 color=red>Weakling...</font>
+								<br/>
+								<button type="button" onclick="location.reload()">Try Again</button>`
+					
+					$("#guessing").html(out)
+					$("#hgAscii").html(pic)
+					
+					if(gover){
+						$("#userInput").append(lost)
+					}
+					
+				}
+			 });
+		};
+	};
+	
+	$("#user_type").keydown(function(event){
+		if(event.keyCode == 13) {
+			event.preventDefault();
+			var letter = $("#user_type").val();
+			$("#user_type").val('')
+			validate(letter)
+			$("#user_type").focus()
+		}
+	});
+	
+	
+		
+
+
+});
+
+
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+<center>
+	<pre id="hgAscii">
+	{{pics}}	
+	</pre>
+	
+	
+	{% if word_len %}
+		<label id="guessing">
+			{% for i in word_len %} {{ i }} {% endfor %}
+		</label>
+	{% endif %}
+		
+	<br/><br/>
+	<div id="userInput">
+		<form id="form" method="POST" validate="{% url 'game' %}">
+			{% csrf_token %}
+			Input Letter:
+			<br/>
+			<input id='user_type' type="text" name="userLetter" maxlength="1" size="1" style="text-align: center;">
+			<br/>
+			<input id="hidden_input" type="hidden">
+		</form>
+	</div>
+</center>
+
+{% endblock %}

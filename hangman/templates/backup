@@ -1,0 +1,35 @@
+
+$(function(){
+	
+	$("#user_type").change(function(){
+		console.log('testtesttesttesttesttesttesttesttesttesttesttesttesttesttest');
+		var letter = $(this).val();
+		var form = $(this).closest("form");
+	
+		
+		$(document).keypress(function(e){
+			$(window).keydown(function(event){
+			if(event.keyCode == 13) {
+				event.preventDefault();
+				console.log('ENTER PRESSED');
+				$("#hidden_input").focus();
+				$(this).focus();
+			}
+			});
+		});
+		
+		
+		
+		$.ajax({
+			url: form.attr("	validate"),
+			data: {
+			  'letter': letter,
+			},
+			dataType: 'json',
+			success: function (data) {
+				console.log(data.error);
+			}
+		  }).done(response => {console.log(response);
+		  });
+	});
+});
