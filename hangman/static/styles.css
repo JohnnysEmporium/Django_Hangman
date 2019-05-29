@@ -1,0 +1,82 @@
+pre{
+  color: white;
+  font-size: 100%;
+  margin-bottom: 0;
+}
+
+label {
+  font-family: Courier;
+  width: 100%;
+  height: 100%;
+}
+
+input {
+  background-color: black;
+  color: white;
+}
+
+body {
+  background-color: black;
+  color: white;
+}
+
+.navbar-brand {
+  left: 0;
+  margin:0 auto;
+  text-align: center;
+}
+
+.bd-placeholder-img {
+  font-size: 1.125rem;
+  text-anchor: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .bd-placeholder-img-lg {
+    font-size: 3.5rem;
+  }
+}
+
+.outer_div{
+     padding: 30px;
+     text-align: center;
+}
+
+.inner_div{
+     display: inline-block;
+     padding: 30px;
+}
+
+.user-input{
+  text-transform: capitalize;
+  text-align: center;
+}
+
+.wrongLetters{
+  position: absolute;
+  top: 13%;
+  left: 36%;
+}
+
+@keyframes dimIn{
+  0%{
+    opacity: 0;
+  }
+
+  100%{
+    opacity: 1;
+  }
+}
+
+.dim-in{
+  display: block;
+  animation: dimIn 2s ease;
+}
+
+.guess{
+  letter-spacing: 20px
+}

@@ -7,59 +7,106 @@
 <script>
 
 
-$(function(){
 
-	var form = $("#user_type").closest("form");
-		
-	function validate(X){
+	$(function(){
 
-		if(X != ''){
-			$.ajax({
-				url: form.attr('validate'),
-				data: {
-				  'letter_web': X,
-				},
-				dataType: 'json',
-				
-				success: function(data){
-					
-					var out = data.guess.join(" ")
-					var pic = data.pics
-					var gover = data.game_over
-					
-					var lost = `<br/><br/>
-								<font size=16 color=red>Weakling...</font>
-								<br/>
-								<button type="button" onclick="location.reload()">Try Again</button>`
-					
-					$("#guessing").html(out)
-					$("#hgAscii").html(pic)
-					
-					if(gover){
-						$("#userInput").append(lost)
+		var form = $("#user_type").closest("form");
+		var gover = null
+		var guess_old = null
+		var pic_old = null
+
+		function validate(X){
+
+			if(X != ''){
+				$.ajax({
+					url: form.attr('validate'),
+					data: {
+						'letter_web': X,
+					},
+					dataType: 'json',
+
+					success: function(data){
+
+						var guess = data.guess
+						var pic = data.pics
+						var gover = data.game_over
+						var wrong_letter = data.wrong_letter
+
+						if(!pic_old){
+							$("#hgpic").empty();
+						}
+
+						for(i = 0; i < pic.length; i++){
+							if(pic_old){
+								if(pic_old[i] !== pic[i]){
+									console.log('inner if')
+									$("#hgpic").children().eq(i).remove()
+									$("#hgpic > pre:nth-child(" + (i) + ")").after("<pre class='dim-in'>" + pic[i] + "</pre>")
+								}
+							} else {
+								$("#hgpic").append("<pre class='dim-in'>" + pic[i] + "</pre>")
+							}
+						}
+						console.log(pic_old)
+						pic_old = pic
+						console.log(pic)
+
+// SPRÓBOWAĆ Z LISTĄ (KOLUMNA OBOK KOLUMNY JAKO "_")
+
+						for(i = 0; i < guess.length; i++){
+							if(guess_old){
+								if(guess_old[i] !== guess[i]){
+									$("#guessing").children().eq(i).remove()
+									$("#guessing > span:nth-child(" + (i) + ")").after("<span class='dim-in guess'>" + guess[i] + "</span>")
+								}
+							} else {
+								$("#guessing > span:nth-child(" + (i) + ")").after("<span class='dim-in guess'>" + guess[i] + "</span>")
+							}
+						}
+						guess_old = guess
+
+						if(wrong_letter !== ''){
+							// for(i = 0; i < wrong_letter.length; i++){
+								$("#wrongLetters_div").append("<label class='dim-in' style='text-transform: capitalize; color:red'>"+wrong_letter+"</label>")
+							// }
+						}
+
+						if(gover == true){
+							$("#won").remove()
+							$("#user_type").prop('disable', true)
+							$("#form_div").animate({opacity: 0}, 1000, 'linear')
+							setTimeout(function(){
+								$('#form_div').remove()
+								$("#lost").css('display', 'inline-block')
+								$("#lost").animate({opacity: 1}, 2000, 'linear')
+							}, 1000)
+						} else if(gover == false){
+							$("#lost").remove()
+							$("#user_type").prop('disable', true)
+							$("#form_div").animate({opacity: 0}, 1000, 'linear')
+							setTimeout(function(){
+								$('#form_div').remove()
+								$("#won").css('display', 'inline-block')
+								$("#won").animate({opacity: 1}, 2000, 'linear')
+							}, 1000)
+						}
 					}
-					
-				}
-			 });
+				});
+			};
 		};
-	};
-	
-	$("#user_type").keydown(function(event){
-		if(event.keyCode == 13) {
-			event.preventDefault();
-			var letter = $("#user_type").val();
-			$("#user_type").val('')
-			validate(letter)
-			$("#user_type").focus()
-		}
+
+		$("#user_type").keydown(function(event){
+			if(event.keyCode == 13) {
+				event.preventDefault();
+				if(gover !== false && gover !== true){
+					var letter = $("#user_type").val();
+					$("#user_type").val('')
+					validate(letter)
+					$("#user_type").focus()
+				}
+			}
+		});
 	});
-	
-	
-		
-
-
-});
-
 
 </script>
 
@@ -68,29 +115,49 @@ $(function(){
 
 {% block content %}
 
-<center>
-	<pre id="hgAscii">
-	{{pics}}	
-	</pre>
-	
-	
-	{% if word_len %}
-		<label id="guessing">
-			{% for i in word_len %} {{ i }} {% endfor %}
-		</label>
-	{% endif %}
-		
-	<br/><br/>
-	<div id="userInput">
-		<form id="form" method="POST" validate="{% url 'game' %}">
-			{% csrf_token %}
-			Input Letter:
-			<br/>
-			<input id='user_type' type="text" name="userLetter" maxlength="1" size="1" style="text-align: center;">
-			<br/>
-			<input id="hidden_input" type="hidden">
-		</form>
-	</div>
-</center>
+<div id="hgpic" class="inner_div">
+{% for i in pics %}<pre>{{ i }}</pre>{% endfor %}
+</div>
+
+<br/>
+
+<div class="inner_div">
+	<label id="guessing">
+{% for i in word_len %}<span class="guess">{{ i }}</span>{% endfor %}
+	</label>
+</div>
+
+<br/>
+
+<div id="wrongLetters_div" class="inner_div wrongLetters dim-in">
+
+</div>
+
+<br/>
+
+<div id="form_div" class="inner_div">
+	<form autocomplete="off" id="form" method="POST" validate="{% url 'game' %}">
+		{% csrf_token %}
+		Input Letter:
+		<br/>
+		<input autocomplete="off" id='user_type' type="text" name="userLetter" maxlength="1" size="1" class="user-input">
+		<br/>
+		<input id="hidden_input" type="hidden">
+	</form>
+</div>
+
+<br/>
+
+<div id="lost" class="inner_div" style="display: none; opacity: 0;">
+	<font size=16 color=red>Weakling...</font>
+	<br/>
+	<button type="button" onclick="location.reload()">Try Again</button>
+</div>
+
+<div id="won" class="inner_div" style="display: none; opacity: 0;">
+	<font size=16 color=green>Congrats</font>
+	<br/>
+	<button type="button" onclick="location.reload()">Try Again</button>
+</div>
 
 {% endblock %}

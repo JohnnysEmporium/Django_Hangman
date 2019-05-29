@@ -7,63 +7,7 @@ words = f.read()
 words = words.split()
 f.close()
 
-HANGMANPICS = ['''
-  +---+
-  |   |
-      |
-      |
-      |
-      |
-=========
-''', '''
-  +---+
-  |   |
-  O   |
-      |
-      |
-      |
-=========
-''', '''
-  +---+
-  |   |
-  O   |
-  |   |
-      |
-      |
-=========
-''', '''
-  +---+
-  |   |
-  O   |
- /|   |
-      |
-      |
-=========
-''', '''
-  +---+
-  |   |
-  O   |
- /|\  |
-      |
-      |
-=========
-''', '''
-  +---+
-  |   |
-  O   |
- /|\  |
- /    |
-      |
-=========
-''', '''
-  +---+
-  |   |
-  O   |
- /|\  |
- / \  |
-      |
-=========
-''']
+HANGMANPICS = [['  +---+', '      |', '      |', '      |', '      |', '      |', '========='], ['  +---+', '  |   |', '      |', '      |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', '      |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', '  |   |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|   |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|\\  |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|\\  |', ' /    |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|\\  |', ' / \\  |', '      |', '=========']]
 
 def home(request):
     min = 0
@@ -76,38 +20,45 @@ def home(request):
     request.session['word'] = word
     request.session['wrong_count'] = 0
     request.session['guess'] = word_len
-    request.session['game_over'] = False 
+    request.session['wrong_letters'] = []
 
-    
     return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len})
 
 def game(request):
-    letter = request.GET.get('letter_web')
+    letter = request.GET.get('letter_web').upper()
     wrong_count = request.session['wrong_count']
-    word = request.session['word']
+    wrong_letters = request.session['wrong_letters']
+    word = request.session['word'].upper()
     guess = request.session['guess']
-    game_over = request.session['game_over']
-
-    if wrong_count >= 5:
-        game_over = True
-
+    wrong_letter = ''
+    
     if letter in word:
         for idx, i in enumerate(word):
             if letter == i:
                   guess[idx] = letter
                   request.session['guess'] = guess
     else:
-        wrong_count += 1
-        request.session['wrong_count'] = wrong_count
+        if letter not in wrong_letters:
+            wrong_letters.append(letter)
+            wrong_letter = wrong_letters[-1]
+            request.session['wrong_letters'] = wrong_letters
+            wrong_count += 1
+            request.session['wrong_count'] = wrong_count
     
+    if wrong_count >= 7:
+        game_over = True
+    elif wrong_count < 7 and '_' not in guess:
+        game_over = False
+    else:
+        game_over = None
+    
+    print(word)
     
     data = {
         'game_over': game_over,
         'pics': HANGMANPICS[wrong_count],
         'guess': guess, 
-        'letter_serv': letter,
+        'wrong_letter': wrong_letter,
         }
     
     return JsonResponse(data)
-    
-        
