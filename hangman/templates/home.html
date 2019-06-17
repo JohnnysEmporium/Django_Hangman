@@ -11,9 +11,8 @@
 	$(function(){
 
 		var form = $("#user_type").closest("form");
-		var gover = null
-		var guess_old = null
-		var pic_old = null
+		var pic_old = null;
+		var gover = null;
 
 		function validate(X){
 
@@ -27,68 +26,66 @@
 
 					success: function(data){
 
-						var guess = data.guess
-						var pic = data.pics
-						var gover = data.game_over
-						var wrong_letter = data.wrong_letter
+						var guess = data.guess;
+						var pic = data.pics;
+						var gover = data.game_over;
+						var wrong_letter = data.wrong_letter;
 
-						if(!pic_old){
-							$("#hgpic").empty();
-						}
+						// if(!pic_old){
+						// 	$("#hgpic").empty();
+						// }
 
-						for(i = 0; i < pic.length; i++){
-							if(pic_old){
-								if(pic_old[i] !== pic[i]){
-									console.log('inner if')
-									$("#hgpic").children().eq(i).remove()
-									$("#hgpic > pre:nth-child(" + (i) + ")").after("<pre class='dim-in'>" + pic[i] + "</pre>")
+						if(wrong_letter !== ''){
+							for(i = 0; i < pic.length; i++){
+								if(pic_old){
+									if(pic_old[i] !== pic[i]){
+										$("#hgpic").children().eq(i).remove();
+										$("#hgpic > pre:nth-child(" + (i) + ")").after("<pre class='dim-in'>" + pic[i] + "</pre>");
+									}
+								} else {
+									$("#hgpic").children().eq(1).remove();
+									$("#hgpic > pre:nth-child(" + (1) + ")").after("<pre class='dim-in'>" + pic[1] + "</pre>");
 								}
-							} else {
-								$("#hgpic").append("<pre class='dim-in'>" + pic[i] + "</pre>")
 							}
 						}
-						console.log(pic_old)
 						pic_old = pic
-						console.log(pic)
 
-// SPRÓBOWAĆ Z LISTĄ (KOLUMNA OBOK KOLUMNY JAKO "_")
 
-						for(i = 0; i < guess.length; i++){
-							if(guess_old){
-								if(guess_old[i] !== guess[i]){
-									$("#guessing").children().eq(i).remove()
-									$("#guessing > span:nth-child(" + (i) + ")").after("<span class='dim-in guess'>" + guess[i] + "</span>")
-								}
-							} else {
-								$("#guessing > span:nth-child(" + (i) + ")").after("<span class='dim-in guess'>" + guess[i] + "</span>")
+						// if(!guess_old){
+						// 	$("#guessing").empty();
+						// }
+						console.log(guess)
+						if(wrong_letter == ''){
+								$("#guessing").empty();
+							for(i = 0; i < guess.length; i++){
+								$("#guessing").append("<span class='dim-in guess'>" + guess[i] + "</span>");
 							}
 						}
-						guess_old = guess
 
 						if(wrong_letter !== ''){
 							// for(i = 0; i < wrong_letter.length; i++){
-								$("#wrongLetters_div").append("<label class='dim-in' style='text-transform: capitalize; color:red'>"+wrong_letter+"</label>")
+								$("#wrongLetters_div").append("<label class='dim-in' style='text-transform: capitalize; color:red; display:block;'>"+wrong_letter+"</label>")
 							// }
 						}
 
-						if(gover == true){
-							$("#won").remove()
-							$("#user_type").prop('disable', true)
-							$("#form_div").animate({opacity: 0}, 1000, 'linear')
+						if(gover == 1){
+							$("#won").remove();
+							$("#user_type").prop('disable', true);
+							$("#form_div").animate({opacity: 0}, 1000, 'linear');
 							setTimeout(function(){
-								$('#form_div').remove()
-								$("#lost").css('display', 'inline-block')
-								$("#lost").animate({opacity: 1}, 2000, 'linear')
-							}, 1000)
-						} else if(gover == false){
-							$("#lost").remove()
-							$("#user_type").prop('disable', true)
-							$("#form_div").animate({opacity: 0}, 1000, 'linear')
+								$('#form_div').remove();
+								$("#lost").css('display', 'inline-block');
+								$("#lost").animate({opacity: 1}, 2000, 'linear');
+							}, 1000);
+						} else if(gover == 0){
+							$("#lost").remove();
+							$("#user_type").prop('disable', true);
+							$("#form_div").animate({opacity: 0}, 1000, 'linear');
 							setTimeout(function(){
-								$('#form_div').remove()
-								$("#won").css('display', 'inline-block')
-								$("#won").animate({opacity: 1}, 2000, 'linear')
-							}, 1000)
+								$('#form_div').remove();
+								$("#won").css('display', 'inline-block');
+								$("#won").animate({opacity: 1}, 2000, 'linear');
+							}, 1000);
 						}
 					}
 				});
@@ -98,11 +95,11 @@
 		$("#user_type").keydown(function(event){
 			if(event.keyCode == 13) {
 				event.preventDefault();
-				if(gover !== false && gover !== true){
+				if(gover !== 0 || gover !== 1){
 					var letter = $("#user_type").val();
-					$("#user_type").val('')
-					validate(letter)
-					$("#user_type").focus()
+					$("#user_type").val('');
+					validate(letter);
+					$("#user_type").focus();
 				}
 			}
 		});
@@ -151,13 +148,13 @@
 <div id="lost" class="inner_div" style="display: none; opacity: 0;">
 	<font size=16 color=red>Weakling...</font>
 	<br/>
-	<button type="button" onclick="location.reload()">Try Again</button>
+	<button type="button" class="btn btn-primary" onclick="location.reload()">Try Again</button>
 </div>
 
 <div id="won" class="inner_div" style="display: none; opacity: 0;">
 	<font size=16 color=green>Congrats</font>
 	<br/>
-	<button type="button" onclick="location.reload()">Try Again</button>
+	<button type="button" class="btn btn-primary" onclick="location.reload()">Try Again</button>
 </div>
 
 {% endblock %}

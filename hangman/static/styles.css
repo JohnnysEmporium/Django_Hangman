@@ -15,9 +15,41 @@ input {
   color: white;
 }
 
+button {
+  background-color: black;
+  color: white;
+  border: 1px solid grey;
+}
+
 body {
   background-color: black;
   color: white;
+}
+
+.form-control{
+  display: inline-block;
+  background: black;
+  color: white;
+  width: 400px;
+}
+
+.form-control:focus{
+  background: black;
+  color: white;
+}
+
+.btn-primary{
+  background: black;
+  border: 1px solid #ced4da;
+}
+
+.btn-primary:hover{
+  background: black;
+}
+
+.alert-dark{
+  background: black;
+  color: white;  
 }
 
 .navbar-brand {
@@ -73,10 +105,9 @@ body {
 }
 
 .dim-in{
-  display: block;
   animation: dimIn 2s ease;
 }
 
 .guess{
-  letter-spacing: 20px
+  padding: 10px;
 }

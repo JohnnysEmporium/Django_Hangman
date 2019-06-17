@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="en-us">
 <head>
-  {% load staticfiles %}
+  {% load static %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
-  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="author" content="Jan Sobczak">
   <meta name="generator" content="Jekyll v3.8.5">
-  <title>Album example · Bootstrap</title>
+  <title>Hangman</title>
 
   <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/album/">
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-  <link rel="stylesheet" href={% static 'styles.css' %}>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
 
   <!-- Custom styles for this template -->
   <link href="album.css" rel="stylesheet">
@@ -22,10 +22,18 @@
 <body>
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="{% url "home" %}">
         <img src="{% static 'man.png' %}" width=40px height=40px class="d-inline-block align-top" />
         Hangman
       </a>
+
+      {% if user.is_authenticated %}
+      <a class="nav-item nav-link" style="color:white;" href="{% url "logout" %}">Logout</a>
+      {% else %}
+      <a class="nav-item nav-link" style="color:white;" href="{% url "login" %}">Login</a>
+      <a class="nav-item nav-link" style="color:white;" href="{% url "signup" %}">Sign Up</a>
+      {% endif %}
+
     </nav>
   </header>
 
@@ -33,6 +41,17 @@
 
     <div class="outer_div">
       <br />
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dark alert-dismissable" role="alert">
+          <button class="close" data-dismiss="alert">
+            <small><sup>x</sup></small>
+          </button>
+          {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
 
       {% block content %}
 
