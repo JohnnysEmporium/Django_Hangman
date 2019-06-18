@@ -23,14 +23,11 @@ def log_in(request):
         return render(request, 'login.html')
 
 def log_out(request):
-    
     logout(request)
     messages.success(request, 'Successfully logged out')
     return redirect('home')
 
 def sign_up(request):
-    
-    
     if request.method == 'POST':
         if request.POST['password1'] == request.POST['password2']:
             try:
@@ -50,21 +47,3 @@ def sign_up(request):
             return redirect('signup')
     else:
         return render(request, 'signup.html')
-    
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-

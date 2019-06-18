@@ -2,6 +2,24 @@
 <html lang="en-us">
 <head>
   {% load static %}
+
+  <style>
+  .footer{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-image: linear-gradient(
+      to right,
+      green {{ grad }},
+      red
+      );
+    color: white;
+    text-align: center;
+    border-radius: 20px;
+  }
+  </style>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
@@ -20,20 +38,20 @@
   <link href="album.css" rel="stylesheet">
 </head>
 <body>
+
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="{% url "home" %}">
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand mr-sm-12" href="{% url "home" %}">
         <img src="{% static 'man.png' %}" width=40px height=40px class="d-inline-block align-top" />
         Hangman
       </a>
-
       {% if user.is_authenticated %}
+      <a class="nav-item nav-link" style="color:white;}">{{ stats.0 }}</a>
       <a class="nav-item nav-link" style="color:white;" href="{% url "logout" %}">Logout</a>
       {% else %}
       <a class="nav-item nav-link" style="color:white;" href="{% url "login" %}">Login</a>
       <a class="nav-item nav-link" style="color:white;" href="{% url "signup" %}">Sign Up</a>
       {% endif %}
-
     </nav>
   </header>
 
@@ -59,6 +77,13 @@
 
       <br />
     </div>
+
+    {% if user.is_authenticated %}
+    <div class = "footer">
+      <a style="float: left;"><font size="20" face="Courier">WON: {{ stats.1 }}</font></a>
+      <a style="float: right;"><font size="20" face="Courier">LOST: {{ stats.2 }}</font></a>
+    </div>
+    {% endif %}
 
   </main>
 
