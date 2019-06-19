@@ -29,22 +29,40 @@ def home(request):
     request.session.modified = True
 
     print(word)
-    
+
+    def _grad_():
+        if win != loss:
+            grad = str((win * 100) / (win + loss))
+            if win == 0 and loss > 0:
+                grad = '-100%'
+            elif win > 0 and loss == 0:
+                grad = '100%'
+            else:
+                if float(grad) < 50:
+                    grad = str(float(grad) - 100) + "%" 
+                else:
+                    grad = grad + '%'
+        else:
+            grad = ''
+        return grad
+        
+    def _top_():
+        events = Event.objects.all().order_by('win')[:5]
+        result = []
+        for i in events:
+            result.append([getattr(i, 'win'), getattr(i, 'name')])
+        result.reverse()    
+        
+        return result
+        
     if request.user.is_authenticated:
         win = getattr(Event.objects.get(name=request.user.username), "win")
         loss = getattr(Event.objects.get(name=request.user.username), "loss")
-        if win != 0 and loss != 0 and win != loss:
-            grad = str((win * 100) / (win + loss))
-            if float(grad) < 0.5:
-                grad = '-' + grad + '%'
-            else:
-                grad = grad + '%'
-        else:
-            grad = ''
         stats = [request.user.username, win, loss]
-        return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len, 'stats': stats, 'grad': grad})
+        return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len, 'stats': stats, 'grad': _grad_(), 'top': _top_()})
+    
     else:
-        return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len})
+        return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len, 'top': _top_()})
 
 
 def game(request):
@@ -55,6 +73,7 @@ def game(request):
     guess = request.session['guess']
     game_over = request.session['game_over']
     wrong_letter = ''
+    usr = Event.objects.filter(name=request.user.username)
     
     def data():
         game_over = request.session['game_over']
@@ -86,19 +105,15 @@ def game(request):
     
     if wrong_count == 7 and game_over == 2:
         request.session['game_over'] = 1
-        Event.objects.update(loss=F('loss') + 1)
+        usr.update(loss=F('loss') + 1)
         request.session.modified = True
         return JsonResponse(data())
     elif wrong_count < 7 and '_' not in guess and game_over == 2:
-        Event.objects.update(win=F('win') + 1)
+        usr.update(win=F('win') + 1)
         request.session['game_over'] = 0
         request.session.modified = True
         return JsonResponse(data())
     elif wrong_count > 7:
         pass    
 
-# ZROBIC COS Z GAME_OVER JAKIS WARUNEK ZEBY NIE PRZEPUSZCZALO PO ZAKONCZENIU GRY
-# username = request.user.username
-
     return JsonResponse(data())
-        

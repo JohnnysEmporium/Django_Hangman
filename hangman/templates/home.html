@@ -64,7 +64,7 @@
 
 						if(wrong_letter !== ''){
 							// for(i = 0; i < wrong_letter.length; i++){
-								$("#wrongLetters_div").append("<label class='dim-in' style='text-transform: capitalize; color:red; display:block;'>"+wrong_letter+"</label>")
+								$("#wrongLetters_div").append("<dt class='dim-in' style='text-transform: capitalize; color:red;'>"+wrong_letter+"</dt>")
 							// }
 						}
 
@@ -111,12 +111,22 @@
 
 
 {% block content %}
+<div class='row'>
+	<div id="top_players" class="top-players col lef">
+		<p style="font-family:'Courier'; "">Top 5:</p>
+		<ol style="font-family:'Courier';">
+			{% for i in top %}<li>{{ i.1 }}</li>{% endfor %}
+		</ol>
+	</div>
 
-<div id="hgpic" class="inner_div" style="padding:0px;">
-{% for i in pics %}<pre>{{ i }}</pre>{% endfor %}
-</div>
+	<div id="hgpic" class="col cen" style="padding:0px;">
+	{% for i in pics %}<pre>{{ i }}</pre>{% endfor %}
+	</div>
 
-<div id="wrongLetters_div" class="inner_div wrongLetters dim-in">
+	<div class="col rig">
+		<dl id="wrongLetters_div" style="font-family:'Courier'; text-align:left;">
+		</dl>
+	</div>
 
 </div>
 
