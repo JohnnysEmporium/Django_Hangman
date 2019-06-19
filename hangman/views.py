@@ -1,8 +1,10 @@
-from django.db.models import F
-from django.shortcuts import render
-from django.http import JsonResponse
-from accounts.models import Event
 import random
+
+from django.db.models import F
+from django.http import JsonResponse
+from django.shortcuts import render
+
+from accounts.models import Event
 
 f = open('static/words.txt')
 words = f.read()
@@ -11,32 +13,39 @@ f.close()
 
 HANGMANPICS = [['  +---+', '      |', '      |', '      |', '      |', '      |', '========='], ['  +---+', '  |   |', '      |', '      |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', '      |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', '  |   |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|   |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|\\  |', '      |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|\\  |', ' /    |', '      |', '========='], ['  +---+', '  |   |', '  O   |', ' /|\\  |', ' / \\  |', '      |', '=========']]
 
+
 def home(request):
     min = 0
     max = len(words)
-    rnd = random.randint(min,max)
+    rnd = random.randint(min, max)
     word = words[rnd]
     word_len = ['_'] * len(word)
 
     request.session['word'] = word
     request.session['wrong_count'] = 0
     request.session['guess'] = word_len
-    request.session['wrong_letters'] = []
+    request.session['wrong_letters'] = ['']
     request.session['game_over'] = 2
     request.session.modified = True
 
+    print(word)
     
     if request.user.is_authenticated:
         win = getattr(Event.objects.get(name=request.user.username), "win")
         loss = getattr(Event.objects.get(name=request.user.username), "loss")
-        if win != 0 and loss != 0:
-            grad = str((win * 100) / (win + loss)) + '%'
+        if win != 0 and loss != 0 and win != loss:
+            grad = str((win * 100) / (win + loss))
+            if float(grad) < 0.5:
+                grad = '-' + grad + '%'
+            else:
+                grad = grad + '%'
         else:
             grad = ''
         stats = [request.user.username, win, loss]
         return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len, 'stats': stats, 'grad': grad})
     else:
         return render(request, 'home.html', {'pics':HANGMANPICS[0], 'word_len': word_len})
+
 
 def game(request):
     letter = request.GET.get('letter_web').upper()
@@ -55,12 +64,11 @@ def game(request):
         data = {
             'game_over': game_over,
             'pics': HANGMANPICS[wrong_count],
-            'guess': guess, 
+            'guess': guess,
             'wrong_letter': wrong_letter,
             }
         
         return data
-    
     
     if letter in word:
         for idx, i in enumerate(word):
@@ -78,22 +86,19 @@ def game(request):
     
     if wrong_count == 7 and game_over == 2:
         request.session['game_over'] = 1
-        Event.objects.update(loss = F('loss') + 1)
+        Event.objects.update(loss=F('loss') + 1)
         request.session.modified = True
         return JsonResponse(data())
     elif wrong_count < 7 and '_' not in guess and game_over == 2:
-        Event.objects.update(win = F('win') + 1)
+        Event.objects.update(win=F('win') + 1)
         request.session['game_over'] = 0
         request.session.modified = True
         return JsonResponse(data())
     elif wrong_count > 7:
         pass    
-    
 
 # ZROBIC COS Z GAME_OVER JAKIS WARUNEK ZEBY NIE PRZEPUSZCZALO PO ZAKONCZENIU GRY
 # username = request.user.username
 
     return JsonResponse(data())
-
-        
         

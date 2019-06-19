@@ -89,9 +89,8 @@ body {
 }
 
 .wrongLetters{
-  position: absolute;
-  top: 13%;
-  left: 36%;
+  float: left;
+  padding: 0px;
 }
 
 @keyframes dimIn{
